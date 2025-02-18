@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Câu Hỏi - Sinh Hoc On Tap</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --background-light: #ffffff;
+            --text-light: #333333;
+            --card-light: #f8f9fa;
+            --border-light: #e0e0e0;
+            
+            --background-dark: #1a1a1a;
+            --text-dark: #ffffff;
+            --card-dark: #2d2d2d;
+            --border-dark: #404040;
+        }
+
+        [data-theme="dark"] {
+            --background: var(--background-dark);
+            --text: var(--text-dark);
+            --card: var(--card-dark);
+            --border: var(--border-dark);
+        }
+
+        [data-theme="light"] {
+            --background: var(--background-light);
+            --text: var(--text-light);
+            --card: var(--card-light);
+            --border: var(--border-light);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        nav {
+            background-color: var(--primary-color);
+            padding: 1rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            margin-left: 2rem;
+            font-weight: 500;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 80px auto 20px;
+            padding: 20px;
+        }
+
+        .question-card {
+            background-color: var(--card);
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .question-card:hover {
+            transform: translateX(5px);
+        }
+
+        .question-card h2 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .answer {
+            display: none;
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: var(--background);
+            border-radius: 5px;
+            border: 1px solid var(--border);
+        }
+
+        .show-answer {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        .show-answer:hover {
+            background-color: #45a049;
+        }
+
+        .highlight {
+            background-color: rgba(76, 175, 80, 0.2);
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background-color: var(--card);
+        }
+
+        th, td {
+            padding: 0.8rem;
+            border: 1px solid var(--border);
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: var(--background);
+        }
+
+        footer {
+            background-color: var(--card);
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .social-links {
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            color: var(--text);
+            font-size: 1.5rem;
+            margin: 0 1rem;
+            transition: color 0.3s;
+        }
+
+        .social-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .copyright {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+
+        .progress-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--card);
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        #progress {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body data-theme="light">
+    <nav>
+        <div class="nav-container">
+            <div class="nav-links">
+                <a href="index.html">Trang chủ</a>
+                <a href="flashcards.html">Thẻ ghi nhớ</a>
+                <a href="questions.html">Câu hỏi</a>
+            </div>
+            <button class="theme-toggle" onclick="toggleTheme()">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Câu Hỏi & Đáp Án</h1>
+
+        <div class="question-card">
+            <h2>Câu 1: Khái niệm sinh trưởng ở sinh vật</h2>
+            <button class="show-answer" onclick="toggleAnswer('answer1')">Xem đáp án</button>
+            <div id="answer1" class="answer">
+                <p><span class="highlight">Sinh trưởng là sự tăng về khối lượng và kích thước của các cơ quan hoặc cơ thể.</span></p>
+                <p>Ví dụ: sự tăng chiều cao cây, sự tăng kích thước lá,...</p>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <h2>Câu 2: Khái niệm phát triển ở sinh vật</h2>
+            <button class="show-answer" onclick="toggleAnswer('answer2')">Xem đáp án</button>
+            <div id="answer2" class="answer">
+                <p><span class="highlight">Phát triển là sự biến đổi về cấu trúc và chức năng của tế bào, mô, cơ quan và cơ thể diễn ra trong quá trình sống của sinh vật.</span></p>
+                <p>Ví dụ: từ hạt thành cây mầm, từ hoa thành quả,...</p>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <h2>Câu 3: Khái niệm vòng đời của sinh vật</h2>
+            <button class="show-answer" onclick="toggleAnswer('answer3')">Xem đáp án</button>
+            <div id="answer3" class="answer">
+                <p><span class="highlight">Vòng đời (chu kì sống) là quá trình lặp lại theo trình tự nhất định các thay đổi mà một cá thể sinh vật phải trải qua, bắt đầu từ khi được sinh ra cho đến các giai đoạn sinh trưởng, phát triển đến cơ thể trưởng thành, có thể sinh sản, rồi chết.</span></p>
+                <p>Ví dụ vòng đời bọ rùa: Trứng → con non → nhộng → con trưởng thành → trứng</p>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <h2>Câu 4: Mô phân sinh và các loại</h2>
+            <button class="show-answer" onclick="toggleAnswer('answer4')">Xem đáp án</button>
+            <div id="answer4" class="answer">
+                <p><span class="highlight">Mô phân sinh là nhóm các tế bào chưa phân hóa, có khả năng phân chia liên tục để tạo các tế bào mới.</span></p>
+                <table>
+                    <tr>
+                        <th>Loại mô phân sinh</th>
+                        <th>Vị trí phân bố</th>
+                        <th>Chức năng</th>
+                        <th>Có ở nhóm thực vật</th>
+                    </tr>
+                    <tr>
+                        <td>Mô phân sinh đỉnh</td>
+                        <td>Chồi ngọn, chồi bên, đỉnh rễ</td>
+                        <td>Làm tăng chiều dài của thân và rễ</td>
+                        <td>Một lá mầm và hai lá mầm</td>
+                    </tr>
+                    <tr>
+                        <td>Mô phân sinh bên</td>
+                        <td>Trong thân, rễ</td>
+                        <td>Làm tăng độ dày của thân và rễ</td>
+                        <td>Hai lá mầm</td>
+                    </tr>
+                    <tr>
+                        <td>Mô phân sinh lóng</td>
+                        <td>Tại các mắt của thân</td>
+                        <td>Làm tăng chiều dài các lóng</td>
+                        <td>Một lá mầm</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <h2>Câu 5: Các hình thức phát triển</h2>
+            <button class="show-answer" onclick="toggleAnswer('answer5')">Xem đáp án</button>
+            <div id="answer5" class="answer">
+                <table>
+                    <tr>
+                        <th>Đặc điểm</th>
+                        <th>Biến thái hoàn toàn</th>
+                        <th>Biến thái không hoàn toàn</th>
+                        <th>Không biến thái</th>
+                    </tr>
+                    <tr>
+                        <td>Hình dạng con non</td>
+                        <td>Rất khác con trưởng thành</td>
+                        <td>Gần giống con trưởng thành</td>
+                        <td>Tương tự con trưởng thành</td>
+                    </tr>
+                    <tr>
+                        <td>Giai đoạn trung gian</td>
+                        <td>Nhiều biến đổi</td>
+                        <td>Nhiều lần lột xác</td>
+                        <td>Không có</td>
+                    </tr>
+                    <tr>
+                        <td>Ví dụ</td>
+                        <td>Muỗi, ếch, ong</td>
+                        <td>Châu chấu, ve sầu, cào cào</td>
+                        <td>Gà, mèo, vịt</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="progress-container">
+        <span>Tiến độ: </span>
+        <span id="progress">0/5</span>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="social-links">
+                <a href="https://github.com/khoi172" target="_blank">
+                    <i class="fab fa-github"></i>
+                </a>
+                <a href="https://facebook.com/@ronaldoGoatskibidi" target="_blank">
+                    <i class="fab fa-facebook"></i>
+                </a>
+                <a href="https://tiktok.com/@trankhoi1325" target="_blank">
+                    <i class="fab fa-tiktok"></i>
+                </a>
+            </div>
+            <div class="copyright">
+                &copy; 2025 - Created by Tran Dang Khoi
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function toggleTheme() {
+            const body = document.body;
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            body.setAttribute('data-theme', newTheme);
+            
+            const themeIcon = document.querySelector('.theme-toggle i');
+            themeIcon.className = newTheme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+            
+            localStorage.setItem('theme', newTheme);
+        }
+
+        function toggleAnswer(id) {
+            const answer = document.getElementById(id);
+            const isHidden = answer.style.display === "none" || answer.style.display === "";
+            answer.style.display = isHidden ? "block" : "none";
+            
+            if (isHidden) {
+                const questionNumber = id.replace('answer', '');
+                localStorage.setItem(`q${questionNumber}Viewed`, 'true');
+                updateProgress();
+            }
+        }
+
+        function updateProgress() {
+            const totalQuestions = 5;
+            let viewedQuestions = 0;
+            
+            for (let i = 1; i <= totalQuestions; i++) {
+                if (localStorage.getItem(`q${i}Viewed`) === 'true') {
+                    viewedQuestions++;
+                }
+            }
+            
+            document.getElementById('progress').textContent = `${viewedQuestions}/${totalQuestions}`;
+        }
+
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.body.setAttribute('data-theme', savedTheme);
+        const themeIcon = document.querySelector('.theme-toggle i');
+        themeIcon.className = savedTheme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+
+        updateProgress();
+
+        const timestampElement = document.createElement('div');
+        timestampElement.className = 'timestamp';
+        timestampElement.style.textAlign = 'center';
+        timestampElement.style.marginTop = '10px';
+        timestampElement.style.fontSize = '0.8rem';
+        timestampElement.style.color = 'var(--text)';
+        timestampElement.innerHTML = `Last updated: 2025-02-18 16:12:11 UTC`;
+        document.querySelector('.footer-content').appendChild(timestampElement);
+
+        const userElement = document.createElement('div');
+        userElement.className = 'user-info';
+        userElement.style.textAlign = 'center';
+        userElement.style.marginTop = '5px';
+        userElement.style.fontSize = '0.8rem';
+        userElement.style.color = 'var(--text)';
+        userElement.innerHTML = `Logged in as: khoi172`;
+        document.querySelector('.footer-content').appendChild(userElement);
+
+        window.onbeforeunload = function() {
+            const endTime = new Date();
+            const studyDuration = Math.floor((endTime - startTime) / 1000);
+            localStorage.setItem('lastStudyDuration', studyDuration);
+        };
+
+        const startTime = new Date();
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key >= '1' && e.key <= '5') {
+                toggleAnswer('answer' + e.key);
+            }
+            if (e.key.toLowerCase() === 't') {
+                toggleTheme();
+            }
+        });
+
+        const tooltipText = document.createElement('div');
+        tooltipText.style.position = 'fixed';
+        tooltipText.style.bottom = '60px';
+        tooltipText.style.right = '20px';
+        tooltipText.style.backgroundColor = 'var(--card)';
+        tooltipText.style.padding = '10px';
+        tooltipText.style.borderRadius = '5px';
+        tooltipText.style.fontSize = '0.8rem';
+        tooltipText.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+        tooltipText.style.color = 'var(--text)';
+        tooltipText.innerHTML = `
+            Phím tắt:<br>
+            1-5: Xem đáp án tương ứng<br>
+            T: Chuyển đổi giao diện sáng/tối
+        `;
+        document.body.appendChild(tooltipText);
+    </script>
+</body>
+</html>

@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thẻ Ghi Nhớ - Sinh Hoc On Tap</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --background-light: #ffffff;
+            --text-light: #333333;
+            --card-light: #f8f9fa;
+            --border-light: #e0e0e0;
+            
+            --background-dark: #1a1a1a;
+            --text-dark: #ffffff;
+            --card-dark: #2d2d2d;
+            --border-dark: #404040;
+        }
+
+        [data-theme="dark"] {
+            --background: var(--background-dark);
+            --text: var(--text-dark);
+            --card: var(--card-dark);
+            --border: var(--border-dark);
+        }
+
+        [data-theme="light"] {
+            --background: var(--background-light);
+            --text: var(--text-light);
+            --card: var(--card-light);
+            --border: var(--border-light);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        nav {
+            background-color: var(--primary-color);
+            padding: 1rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            margin-left: 2rem;
+            font-weight: 500;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 80px auto 20px;
+            padding: 20px;
+        }
+
+        .flashcard-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            perspective: 1000px;
+        }
+
+        .flashcard {
+            width: 100%;
+            height: 300px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.8s;
+        }
+
+        .flashcard.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .flashcard-front {
+            background-color: var(--card);
+            border: 2px solid var(--primary-color);
+        }
+
+        .flashcard-back {
+            background-color: var(--primary-color);
+            color: white;
+            transform: rotateY(180deg);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .control-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .control-btn:hover {
+            background-color: #45a049;
+        }
+
+        .control-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background-color: var(--border);
+            margin: 2rem 0;
+            border-radius: 2px;
+        }
+
+        .progress {
+            height: 100%;
+            background-color: var(--primary-color);
+            border-radius: 2px;
+            transition: width 0.3s;
+        }
+
+        footer {
+            background-color: var(--card);
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .social-links {
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            color: var(--text);
+            font-size: 1.5rem;
+            margin: 0 1rem;
+            transition: color 0.3s;
+        }
+
+        .social-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .copyright {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+
+        .card-counter {
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+
+        .keyboard-shortcuts {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--card);
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body data-theme="light">
+    <nav>
+        <div class="nav-container">
+            <div class="nav-links">
+                <a href="index.html">Trang chủ</a>
+                <a href="flashcards.html">Thẻ ghi nhớ</a>
+                <a href="questions.html">Câu hỏi</a>
+            </div>
+            <button class="theme-toggle" onclick="toggleTheme()">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Thẻ Ghi Nhớ</h1>
+        
+        <div class="progress-bar">
+            <div class="progress" id="progress"></div>
+        </div>
+
+        <div class="flashcard-container">
+            <div class="flashcard" onclick="toggleCard()">
+                <div class="flashcard-front">
+                    <h2 id="question"></h2>
+                </div>
+                <div class="flashcard-back">
+                    <p id="answer"></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="control-btn" onclick="prevCard()" id="prevBtn">
+                <i class="fas fa-chevron-left"></i> Trước
+            </button>
+            <button class="control-btn" onclick="nextCard()" id="nextBtn">
+                Tiếp <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+
+        <div class="card-counter">
+            Thẻ <span id="currentCard">1</span>/<span id="totalCards">5</span>
+        </div>
+    </div>
+
+    <div class="keyboard-shortcuts">
+        Phím tắt:<br>
+        Space: Lật thẻ<br>
+        ← →: Thẻ trước/sau<br>
+        T: Chế độ sáng/tối
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="social-links">
+                <a href="https://github.com/khoi172" target="_blank">
+                    <i class="fab fa-github"></i>
+                </a>
+                <a href="https://facebook.com/@ronaldoGoatskibidi" target="_blank">
+                    <i class="fab fa-facebook"></i>
+                </a>
+                <a href="https://tiktok.com/@trankhoi1325" target="_blank">
+                    <i class="fab fa-tiktok"></i>
+                </a>
+            </div>
+            <div class="copyright">
+                &copy; 2025 - Created by Tran Dang Khoi
+            </div>
+            <div class="timestamp" style="margin-top: 10px; font-size: 0.8rem;">
+                Last updated: 2025-02-18 16:15:23 UTC
+            </div>
+            <div class="user-info" style="margin-top: 5px; font-size: 0.8rem;">
+                Logged in as: khoi172
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const flashcards = [
+            {
+                question: "Sinh trưởng là gì?",
+                answer: "Sinh trưởng là sự tăng về khối lượng và kích thước của các cơ quan hoặc cơ thể."
+            },
+            {
+                question: "Phát triển là gì?",
+                answer: "Phát triển là sự biến đổi về cấu trúc và chức năng của tế bào, mô, cơ quan và cơ thể diễn ra trong quá trình sống của sinh vật."
+            },
+            {
+                question: "Vòng đời là gì?",
+                answer: "Vòng đời (chu kì sống) là quá trình lặp lại theo trình tự nhất định các thay đổi mà một cá thể sinh vật phải trải qua, từ khi sinh ra đến khi chết."
+            },
+            {
+                question: "Mô phân sinh là gì?",
+                answer: "Mô phân sinh là nhóm các tế bào chưa phân hóa, có khả năng phân chia liên tục để tạo các tế bào mới."
+            },
+            {
+                question: "Nêu ví dụ về biến thái hoàn toàn",
+                answer: "Ví dụ về biến thái hoàn toàn: Muỗi, ếch, ong - Con non rất khác con trưởng thành và phải trải qua nhiều biến đổi."
+            }
+        ];
+
+        let currentCardIndex = 0;
+        let isCardFlipped = false;
+
+        function updateCard() {
+            document.getElementById('question').textContent = flashcards[currentCardIndex].question;
+            document.getElementById('answer').textContent = flashcards[currentCardIndex].answer;
+            document.getElementById('currentCard').textContent = currentCardIndex + 1;
+            document.getElementById('totalCards').textContent = flashcards.length;
+
+            const progress = ((currentCardIndex + 1) / flashcards.length) * 100;
+            document.getElementById('progress').style.width = `${progress}%`;
+
+            document.getElementById('prevBtn').disabled = currentCardIndex === 0;
+            document.getElementById('nextBtn').disabled = currentCardIndex === flashcards.length - 1;
+
+            document.querySelector('.flashcard').classList.remove('flipped');
+            isCardFlipped = false;
+        }
+
+        function toggleCard() {
+            const card = document.querySelector('.flashcard');
+            card.classList.toggle('flipped');
+            isCardFlipped = !isCardFlipped;
+        }
+
+        function nextCard() {
+            if (currentCardIndex < flashcards.length - 1) {
+                currentCardIndex++;
+                updateCard();
+            }
+        }
+
+        function prevCard() {
+            if (currentCardIndex > 0) {
+                currentCardIndex--;
+                updateCard();
+            }
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            body.setAttribute('data-theme', newTheme);
+            
+            const themeIcon = document.querySelector('.theme-toggle i');
+            themeIcon.className = newTheme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+            
+            localStorage.setItem('theme', newTheme);
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                toggleCard();
+            }
+            if (e.code === 'ArrowLeft') {
+                prevCard();
+            }
+            if (e.code === 'ArrowRight') {
+                nextCard();
+            }
+            if (e.key.toLowerCase() === 't') {
+                toggleTheme();
+            }
+        });
+
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.body.setAttribute('data-theme', savedTheme);
+        const themeIcon = document.querySelector('.theme-toggle i');
+        themeIcon.className = savedTheme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+
+        updateCard();
+    </script>
+</body>
+</html>
